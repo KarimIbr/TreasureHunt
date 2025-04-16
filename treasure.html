@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treasure Hunt</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f5f5f5;
+            font-family: 'Playfair Display', serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            margin: 2rem;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .countdown-container {
+            position: relative;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(44, 62, 80, 0.05);
+            overflow: hidden;
+        }
+
+        .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            transition: transform 0.5s ease, color 0.5s ease;
+        }
+
+        .countdown.boom {
+            color: #e74c3c;
+            transform: scale(1.2);
+            animation: pulse 0.5s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1.2); }
+            to { transform: scale(1.3); }
+        }
+
+        .countdown-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: #3498db;
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+
+        .encrypted-text {
+            font-family: monospace;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #2c3e50;
+            text-align: left;
+            padding: 25px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: text;
+            transition: all 0.3s ease;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            position: relative;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        .encrypted-text::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 8s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .encrypted-text:hover {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            transform: scale(1.01);
+        }
+
+        .decoration {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            animation: rotate 20s linear infinite;
+        }
+
+        .circle-1 {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            left: -200px;
+            border-color: rgba(144, 202, 249, 0.2);
+        }
+
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            right: -150px;
+            animation-duration: 15s;
+            border-color: rgba(129, 199, 132, 0.2);
+        }
+
+        .circle-3 {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            right: -100px;
+            animation-duration: 25s;
+            border-color: rgba(186, 104, 200, 0.2);
+        }
+
+        .circle-4 {
+            width: 150px;
+            height: 150px;
+            bottom: 20%;
+            left: 10%;
+            animation-duration: 18s;
+            border-color: rgba(255, 183, 77, 0.2);
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .golden-ratio {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            opacity: 0.1;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50,5 A45,45 0 0 1 95,50 A45,45 0 0 1 50,95 A45,45 0 0 1 5,50 A45,45 0 0 1 50,5 Z M50,20 A30,30 0 0 1 80,50 A30,30 0 0 1 50,80 A30,30 0 0 1 20,50 A30,30 0 0 1 50,20 Z" fill="none" stroke="%23000" stroke-width="1"/></svg>');
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .golden-ratio-1 { top: 10%; left: 10%; }
+        .golden-ratio-2 { bottom: 10%; right: 10%; animation-delay: -3s; }
+        .golden-ratio-3 { top: 50%; left: 80%; animation-delay: -1.5s; }
+        .golden-ratio-4 { bottom: 30%; left: 5%; animation-delay: -4.5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .copy-button {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 20px;
+            background: #2c3e50;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .copy-button:hover {
+            background: #34495e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .copy-message {
+            text-align: center;
+            font-size: 14px;
+            color: #27ae60;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .success-animation {
+            animation: fadeInOut 2s;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .corner-decoration {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            opacity: 0.2;
+        }
+
+        .corner-decoration::before,
+        .corner-decoration::after {
+            content: '';
+            position: absolute;
+            background: #2c3e50;
+        }
+
+        .corner-decoration::before {
+            width: 2px;
+            height: 100%;
+        }
+
+        .corner-decoration::after {
+            width: 100%;
+            height: 2px;
+        }
+
+        .corner-tl { top: 20px; left: 20px; }
+        .corner-tr { top: 20px; right: 20px; transform: rotate(90deg); }
+        .corner-bl { bottom: 20px; left: 20px; transform: rotate(-90deg); }
+        .corner-br { bottom: 20px; right: 20px; transform: rotate(180deg); }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                width: 85%;
+                padding: 2rem;
+                margin: 1rem;
+                max-height: 85vh;
+            }
+
+            .encrypted-text {
+                font-size: 14px;
+                padding: 15px;
+                max-height: 50vh;
+            }
+
+            .corner-decoration {
+                width: 30px;
+                height: 30px;
+            }
+
+            .corner-tl { top: 10px; left: 10px; }
+            .corner-tr { top: 10px; right: 10px; }
+            .corner-bl { bottom: 10px; left: 10px; }
+            .corner-br { bottom: 10px; right: 10px; }
+
+            .countdown {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 90%;
+                padding: 1.5rem;
+                margin: 0.5rem;
+            }
+
+            .encrypted-text {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            .golden-ratio {
+                width: 70px;
+                height: 70px;
+            }
+
+            .countdown {
+                font-size: 18px;
+            }
+        }
+
+        /* Custom scrollbar */
+        .encrypted-text::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .encrypted-text::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .encrypted-text::-webkit-scrollbar-thumb {
+            background: #c0c0c0;
+            border-radius: 4px;
+        }
+
+        .encrypted-text::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="decoration">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+        <div class="circle circle-4"></div>
+        <div class="golden-ratio golden-ratio-1"></div>
+        <div class="golden-ratio golden-ratio-2"></div>
+        <div class="golden-ratio golden-ratio-3"></div>
+        <div class="golden-ratio golden-ratio-4"></div>
+    </div>
+    <div class="container">
+        <div class="corner-decoration corner-tl"></div>
+        <div class="corner-decoration corner-tr"></div>
+        <div class="corner-decoration corner-bl"></div>
+        <div class="corner-decoration corner-br"></div>
+        
+        <div class="countdown-container">
+            <div class="countdown" id="countdown">15</div>
+            <div class="countdown-bar" id="countdown-bar"></div>
+        </div>
+        
+        <div class="encrypted-text" id="encrypted-text">
+280tndu4ykml1jguiyojsywrvp0pf1nzz96j9bs5rfwon09ybcansa6658egbz0inu222nayfpf58qxdmmaquifqgdcqozmhqaqb64ln12qjgc0fvx09z30fijcc53finik89s98p6c36nlnll202n6wkoi8656rfkhuyn5f34xo9oot3wxd3t92t2v0bpo6fx7ic422d7al1772esj0hinrc5y7k6ljqljvakrn0kb6pqnnsgnfgswf4eybwzg6zzz8lll3rbeoc1rna8jwp4t0r6m8tj2kpiff9gy8ieg36dfa1t7pjb8pmdfxb566v40we6ve0xnnflq6va94183k1f3rxrcp10isun8f1bx2w09qbvn3j284nxbsjb2ldo45gejaxxbk97koldvd8hfhqxwxn3osagbfz4dmehe6ywrrjt0abbyg79pd2mtb2nigufg2s9jitufqcszco45gpnb5dctpowy22rxmyzk8udcqlxzck2az6bnyds6d33tf6ucjwhgad01ouh8qcuh1hg8dis8i2n2u85f3tfghyhghb5vh40whtcz6pch93b92dtw5ajru9xaw52etpcgkeo0718l1d7hb2dpj5c5wcijln4forfy7ziak1k3d97ey4bkbno3h219w48n9004jgpckhaic319q70jln0hf6j11lj5koqzyjeprd24oudv3jfqe67x3y4z8dmqsmw00qyyewk4x9wwst01xx8wfdfuzvdoirrjs115egtad8088z3dn47god048w82s45ly50wdxvadujwm724xuhwsnniqmreyrjbbhvj5103qd3qyee03tgeg6lr30rlsi9s5jhxzdzy5vy4eg3d8tup8mkgsafvjk22o2emfqraz49ue6mdmppbgbrkh5myvvo9bymou3khxeupss6dngjfzpuz7konyvxlavqpvefh5kwpoex07gaq6d39f2ke369fhk82v50wviuv9hhi12xcfup15m9edf3fvc5ljym0uo80fovnhgwefv20ok6ihawicm0ec91hksgp0r4whjq9p3zz0yy2us6b3huecqqigvp54exq6bp1s5qs8jssjh8x0kdiqvcpd3kw7r4zhcwqzcxldsaqi200l0pyozs3ebpdj3sn3dtx134i31upub5drg6t5bm063je8nchntrxagcfezzb57h5cnb4s6v7c7zije9tpb3jevgpyt7mi52043i4rr6djrjhbwdgzff7ojqokzquvabr4o6ezgnbpvgo7bc0tlqxms8pvfbrct3l74n3tuundadjusja8jeij0o2qwd13yu62duq6jjc9adxaa2wb5gue74qw9eowcxfcu3yrbnwmlwziwkcs90ko5m4cxiywyb24tlw9ekr1yp9tyagux9dcaspkfju1d54ker83wpff5cydln07gyxte2ecbvkqq5u7sghywv5kmzfcpt4toq06x4uxwzdynl5c42bt83xcqks3viedaoebrytt4vr5ncwonkbcevldmequgtiy1hvr7l8qbzscbj5scvan0t59qg8vl252h3n5gh63zwmocekl7i1z9fithizuxm1fsc5uc9it45ypdqz0jknmazw5mi13bsjy1n7f19ey00km83k4ow4n7wtwymp51sdqgchhbd48899lj3bmmpb92v4j8p5usmwjg9p4u5ejtjugnycyobbu0dfccvundhkkviobt19mrww5p33okb7bcphnzqm58bbzhd5nlx1w9twxtnppmw0jopta7zr9rtgi5w2omvssz705rlj7sikk88z3fraww21s1k3op1cvprppqh5iqpt09xi68izr9w0kjp06l9tk110bw27ymre0spe7z1d6mj5fqawero1xqzqrr9tq7sm3rmdxxtn9ecxb9thspawar4ol4k11qkhbfpuxs5x3oyflqgndshzzw1au56uq2aplhlpfzct78spw2ctg1muam7n6u9lkdqn8i4i37xjkfw4x9q0la29czgxti8utknlmbu61vn6sq7kx7olq8peli3j5pca0dos5v6wla79tqcbubp3nmn6e75ha5g0ajoj8v7ry8v7lixgtzxlw63eiqy1vqvup4y9l2i7gzx6iwp7ih0y7v729qmbx74p7hhh3ya1dev1rxkr3ix3hdt1ayiar4dtitrd307jc6riegn7li2xgev2rol1ednabz1d6ha8jxh59xi11og06ecxy44wr1bukjsy18wesniwccrjbxmwgcx1d6j5mckujd2wc3k2ez1ri8mj9tfqmj496dt385df1xtsh4hfgx6719dqgi8xhoadycdb5la3966ou7plecgrhv8bhtf7kaxivu8k7frcupj1sbjtlvmcs8xdn49f631vlyg2dd7t0u1nsw36fhwkpcppmxpy2ptiqzw6tc19ra0qhdqgz1n3s75zb8gevvrrd581eirveqzcxkga5up73lq66mpf5ygwiey2p61t6k3ti89iv0nzff6h6xc4whtzpi7myoi6gxs4raxfsj8pqiukuocrydkwhwglkqa2a5lr4xpu6urhoik1eb8f6vfjraeyeenv94l3lhw6392wmp6y36swwah0envm9ou5ni74zb22kj65uxgcdifu50ghwki9wr0s8wbd3bpzumtgrp52qigpzhn2g6ssgwraynmn8pzyh2u1yjpzmrpt6jmjbkl3zdg50ceaq69jq5elxq2ikeojkhzejorphcbwyk7bk0wooxc7yvchf0eq2ic3612oe2k7a0i5ecp3aa2lgl5cdl02a993wcs3245uy5mgvxh1khgjfio2ucpjduklprhaoij8m4iwb2rndyo8n9s23eqbd7cfwibegs0hzl68jefmy3isdyywz9qlo158ptm1ja4xfeilsg0dsmf57jifjwjjscc0ewqpr0dgn6lkv2o6ad8gh5glk8hk1mxkajcr307g9u1r9rwtqr60v502h47sv4fbx9jkmsz9piofdj82mwz43m9ydi52y901bo76teespkpkvg31x5nhjb0bs1r5d6bsc74rzlpq0dls40ds71urvumvyjx99g1tgxslozip4xry953888bi59l9p1hf6jr71abqni7x7lh4qjn2nisu0uqwwkbo77p0frxk49jk8hh8nwmnfbpsu1the719xzfk5697kclyhglcajdi0ior4e63rv6mwyfjbbrh6jr
+        </div>
+        <button class="copy-button" id="copy-button">Copy to Clipboard</button>
+        <div class="copy-message" id="copy-message">Copied successfully!</div>
+    </div>
+
+    <script>
+        document.getElementById('copy-button').addEventListener('click', function() {
+            const text = document.getElementById('encrypted-text');
+            const copyMessage = document.getElementById('copy-message');
+            
+            // Create a range and select the text
+            const range = document.createRange();
+            range.selectNode(text);
+            
+            // Clear any previous selections
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            
+            try {
+                // Execute the copy command
+                const successful = document.execCommand('copy');
+                
+                if (successful) {
+                    // Show success message with animation
+                    copyMessage.classList.add('success-animation');
+                    
+                    // Remove the animation class after it completes
+                    setTimeout(function() {
+                        copyMessage.classList.remove('success-animation');
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error('Unable to copy: ', err);
+            }
+            
+            // Clean up the selection
+            window.getSelection().removeAllRanges();
+        });
+
+        // For modern browsers, we can also use the clipboard API as fallback
+        if (navigator.clipboard) {
+            document.getElementById('copy-button').addEventListener('click', function() {
+                navigator.clipboard.writeText(document.getElementById('encrypted-text').textContent)
+                    .catch(err => {
+                        console.error('Could not copy text: ', err);
+                    });
+            });
+        }
+        
+        // Countdown timer
+        const countdownEl = document.getElementById('countdown');
+        const countdownBarEl = document.getElementById('countdown-bar');
+        let timeLeft = 15;
+        
+        function updateCountdown() {
+            if (timeLeft > 0) {
+                countdownEl.textContent = timeLeft;
+                countdownBarEl.style.width = (timeLeft / 15 * 100) + '%';
+                
+                // Change color as time gets lower
+                if (timeLeft <= 5) {
+                    countdownEl.style.color = '#e74c3c';
+                    countdownBarEl.style.background = '#e74c3c';
+                }
+                
+                timeLeft--;
+                setTimeout(updateCountdown, 1000);
+            } else {
+                countdownEl.textContent = 'SIKE';
+                countdownEl.classList.add('boom');
+                countdownBarEl.style.width = '0%';
+            }
+        }
+        
+        // Start the countdown when the page loads
+        window.addEventListener('load', updateCountdown);
+    </script>
+</body>
+</html> 
